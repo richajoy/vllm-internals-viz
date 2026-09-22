@@ -1,0 +1,101 @@
+{
+ "name": "continuous_batching",
+ "config": {
+  "block_size": 4,
+  "num_gpu_blocks": 20,
+  "max_num_batched_tokens": 64,
+  "max_num_seqs": 4,
+  "enable_prefix_caching": true,
+  "enable_chunked_prefill": true,
+  "long_prefill_token_threshold": 0,
+  "policy": "fcfs",
+  "async_scheduling": false,
+  "num_speculative_tokens": 0,
+  "max_model_len": 64
+ },
+ "max_steps": 30,
+ "requests": [
+  {
+   "request_id": "A",
+   "prompt_token_ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+   ],
+   "max_tokens": 4,
+   "arrival_step": 0,
+   "priority": 0,
+   "output_token_ids": [
+    101,
+    102,
+    103,
+    104
+   ]
+  },
+  {
+   "request_id": "B",
+   "prompt_token_ids": [
+    1,
+    2,
+    3,
+    4,
+    7,
+    8,
+    9,
+    10,
+    11
+   ],
+   "max_tokens": 2,
+   "arrival_step": 1,
+   "priority": 0,
+   "output_token_ids": [
+    201,
+    202
+   ]
+  },
+  {
+   "request_id": "C",
+   "prompt_token_ids": [
+    20,
+    21,
+    22
+   ],
+   "max_tokens": 5,
+   "arrival_step": 1,
+   "priority": 0,
+   "output_token_ids": [
+    301,
+    302,
+    303,
+    304,
+    305
+   ]
+  },
+  {
+   "request_id": "D",
+   "prompt_token_ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    30,
+    31,
+    32,
+    33
+   ],
+   "max_tokens": 3,
+   "arrival_step": 3,
+   "priority": 0,
+   "output_token_ids": [
+    401,
+    402,
+    403
+   ]
+  }
+ ]
+}

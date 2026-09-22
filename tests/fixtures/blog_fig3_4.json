@@ -1,0 +1,790 @@
+{
+ "name": "blog_fig3_4",
+ "vllm_commit": "adc3e03517",
+ "scheduler_class": "Scheduler",
+ "config": {
+  "block_size": 4,
+  "num_gpu_blocks": 10,
+  "max_num_batched_tokens": 64,
+  "max_num_seqs": 4,
+  "enable_prefix_caching": false,
+  "enable_chunked_prefill": true,
+  "long_prefill_token_threshold": 0,
+  "policy": "fcfs",
+  "async_scheduling": false,
+  "num_speculative_tokens": 0,
+  "max_model_len": 64
+ },
+ "requests": [
+  {
+   "request_id": "R1",
+   "prompt_token_ids": [
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "max_tokens": 2,
+   "arrival_step": 0,
+   "priority": 0,
+   "output_token_ids": [
+    101,
+    102
+   ]
+  },
+  {
+   "request_id": "R2",
+   "prompt_token_ids": [
+    1,
+    6,
+    5,
+    7,
+    8,
+    9,
+    10
+   ],
+   "max_tokens": 2,
+   "arrival_step": 0,
+   "priority": 0,
+   "output_token_ids": [
+    201,
+    202
+   ]
+  },
+  {
+   "request_id": "R3",
+   "prompt_token_ids": [
+    1,
+    12,
+    13
+   ],
+   "max_tokens": 2,
+   "arrival_step": 0,
+   "priority": 0,
+   "output_token_ids": [
+    301,
+    302
+   ]
+  }
+ ],
+ "num_steps": 3,
+ "steps": [
+  {
+   "step": 0,
+   "arrivals": [
+    "R1",
+    "R2",
+    "R3"
+   ],
+   "scheduler_output": {
+    "scheduled_new_reqs": [
+     {
+      "req_id": "R1",
+      "block_ids": [
+       [
+        1,
+        2
+       ]
+      ],
+      "num_computed_tokens": 0
+     },
+     {
+      "req_id": "R2",
+      "block_ids": [
+       [
+        3,
+        4
+       ]
+      ],
+      "num_computed_tokens": 0
+     },
+     {
+      "req_id": "R3",
+      "block_ids": [
+       [
+        5
+       ]
+      ],
+      "num_computed_tokens": 0
+     }
+    ],
+    "scheduled_cached_reqs": {
+     "req_ids": [],
+     "resumed_req_ids": [],
+     "new_block_ids": [],
+     "num_computed_tokens": [],
+     "num_output_tokens": []
+    },
+    "num_scheduled_tokens": {
+     "R1": 5,
+     "R2": 7,
+     "R3": 3
+    },
+    "total_num_scheduled_tokens": 15,
+    "scheduled_spec_decode_tokens": {},
+    "num_common_prefix_blocks": [
+     0
+    ],
+    "finished_req_ids": [],
+    "preempted": []
+   },
+   "after_schedule": {
+    "free_queue_order": [
+     6,
+     7,
+     8,
+     9
+    ],
+    "num_free_blocks": 4,
+    "blocks": {
+     "1": {
+      "ref_cnt": 1,
+      "has_hash": false
+     },
+     "2": {
+      "ref_cnt": 1,
+      "has_hash": false
+     },
+     "3": {
+      "ref_cnt": 1,
+      "has_hash": false
+     },
+     "4": {
+      "ref_cnt": 1,
+      "has_hash": false
+     },
+     "5": {
+      "ref_cnt": 1,
+      "has_hash": false
+     },
+     "6": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "7": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "8": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "9": {
+      "ref_cnt": 0,
+      "has_hash": false
+     }
+    },
+    "cached_hash_count": 0,
+    "requests": {
+     "R1": {
+      "status": "RUNNING",
+      "num_computed_tokens": 5,
+      "num_tokens": 5,
+      "num_prompt_tokens": 5,
+      "num_output_tokens": 0,
+      "num_output_placeholders": 0,
+      "spec_token_ids": [],
+      "block_ids": [
+       [
+        1,
+        2
+       ]
+      ]
+     },
+     "R2": {
+      "status": "RUNNING",
+      "num_computed_tokens": 7,
+      "num_tokens": 7,
+      "num_prompt_tokens": 7,
+      "num_output_tokens": 0,
+      "num_output_placeholders": 0,
+      "spec_token_ids": [],
+      "block_ids": [
+       [
+        3,
+        4
+       ]
+      ]
+     },
+     "R3": {
+      "status": "RUNNING",
+      "num_computed_tokens": 3,
+      "num_tokens": 3,
+      "num_prompt_tokens": 3,
+      "num_output_tokens": 0,
+      "num_output_placeholders": 0,
+      "spec_token_ids": [],
+      "block_ids": [
+       [
+        5
+       ]
+      ]
+     }
+    },
+    "running_order": [
+     "R1",
+     "R2",
+     "R3"
+    ],
+    "waiting_order": [],
+    "skipped_waiting_order": []
+   },
+   "update_for_step": 0,
+   "model_runner_output": {
+    "req_ids": [
+     "R1",
+     "R2",
+     "R3"
+    ],
+    "sampled_token_ids": [
+     [
+      101
+     ],
+     [
+      201
+     ],
+     [
+      301
+     ]
+    ]
+   },
+   "outputs": {
+    "R1": {
+     "new_token_ids": [
+      101
+     ],
+     "finish_reason": null
+    },
+    "R2": {
+     "new_token_ids": [
+      201
+     ],
+     "finish_reason": null
+    },
+    "R3": {
+     "new_token_ids": [
+      301
+     ],
+     "finish_reason": null
+    }
+   },
+   "after_update": {
+    "free_queue_order": [
+     6,
+     7,
+     8,
+     9
+    ],
+    "num_free_blocks": 4,
+    "blocks": {
+     "1": {
+      "ref_cnt": 1,
+      "has_hash": false
+     },
+     "2": {
+      "ref_cnt": 1,
+      "has_hash": false
+     },
+     "3": {
+      "ref_cnt": 1,
+      "has_hash": false
+     },
+     "4": {
+      "ref_cnt": 1,
+      "has_hash": false
+     },
+     "5": {
+      "ref_cnt": 1,
+      "has_hash": false
+     },
+     "6": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "7": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "8": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "9": {
+      "ref_cnt": 0,
+      "has_hash": false
+     }
+    },
+    "cached_hash_count": 0,
+    "requests": {
+     "R1": {
+      "status": "RUNNING",
+      "num_computed_tokens": 5,
+      "num_tokens": 6,
+      "num_prompt_tokens": 5,
+      "num_output_tokens": 1,
+      "num_output_placeholders": 0,
+      "spec_token_ids": [],
+      "block_ids": [
+       [
+        1,
+        2
+       ]
+      ]
+     },
+     "R2": {
+      "status": "RUNNING",
+      "num_computed_tokens": 7,
+      "num_tokens": 8,
+      "num_prompt_tokens": 7,
+      "num_output_tokens": 1,
+      "num_output_placeholders": 0,
+      "spec_token_ids": [],
+      "block_ids": [
+       [
+        3,
+        4
+       ]
+      ]
+     },
+     "R3": {
+      "status": "RUNNING",
+      "num_computed_tokens": 3,
+      "num_tokens": 4,
+      "num_prompt_tokens": 3,
+      "num_output_tokens": 1,
+      "num_output_placeholders": 0,
+      "spec_token_ids": [],
+      "block_ids": [
+       [
+        5
+       ]
+      ]
+     }
+    },
+    "running_order": [
+     "R1",
+     "R2",
+     "R3"
+    ],
+    "waiting_order": [],
+    "skipped_waiting_order": []
+   }
+  },
+  {
+   "step": 1,
+   "arrivals": [],
+   "scheduler_output": {
+    "scheduled_new_reqs": [],
+    "scheduled_cached_reqs": {
+     "req_ids": [
+      "R1",
+      "R2",
+      "R3"
+     ],
+     "resumed_req_ids": [],
+     "new_block_ids": [
+      null,
+      null,
+      null
+     ],
+     "num_computed_tokens": [
+      5,
+      7,
+      3
+     ],
+     "num_output_tokens": [
+      1,
+      1,
+      1
+     ]
+    },
+    "num_scheduled_tokens": {
+     "R1": 1,
+     "R2": 1,
+     "R3": 1
+    },
+    "total_num_scheduled_tokens": 3,
+    "scheduled_spec_decode_tokens": {},
+    "num_common_prefix_blocks": [
+     0
+    ],
+    "finished_req_ids": [],
+    "preempted": []
+   },
+   "after_schedule": {
+    "free_queue_order": [
+     6,
+     7,
+     8,
+     9
+    ],
+    "num_free_blocks": 4,
+    "blocks": {
+     "1": {
+      "ref_cnt": 1,
+      "has_hash": false
+     },
+     "2": {
+      "ref_cnt": 1,
+      "has_hash": false
+     },
+     "3": {
+      "ref_cnt": 1,
+      "has_hash": false
+     },
+     "4": {
+      "ref_cnt": 1,
+      "has_hash": false
+     },
+     "5": {
+      "ref_cnt": 1,
+      "has_hash": false
+     },
+     "6": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "7": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "8": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "9": {
+      "ref_cnt": 0,
+      "has_hash": false
+     }
+    },
+    "cached_hash_count": 0,
+    "requests": {
+     "R1": {
+      "status": "RUNNING",
+      "num_computed_tokens": 6,
+      "num_tokens": 6,
+      "num_prompt_tokens": 5,
+      "num_output_tokens": 1,
+      "num_output_placeholders": 0,
+      "spec_token_ids": [],
+      "block_ids": [
+       [
+        1,
+        2
+       ]
+      ]
+     },
+     "R2": {
+      "status": "RUNNING",
+      "num_computed_tokens": 8,
+      "num_tokens": 8,
+      "num_prompt_tokens": 7,
+      "num_output_tokens": 1,
+      "num_output_placeholders": 0,
+      "spec_token_ids": [],
+      "block_ids": [
+       [
+        3,
+        4
+       ]
+      ]
+     },
+     "R3": {
+      "status": "RUNNING",
+      "num_computed_tokens": 4,
+      "num_tokens": 4,
+      "num_prompt_tokens": 3,
+      "num_output_tokens": 1,
+      "num_output_placeholders": 0,
+      "spec_token_ids": [],
+      "block_ids": [
+       [
+        5
+       ]
+      ]
+     }
+    },
+    "running_order": [
+     "R1",
+     "R2",
+     "R3"
+    ],
+    "waiting_order": [],
+    "skipped_waiting_order": []
+   },
+   "update_for_step": 1,
+   "model_runner_output": {
+    "req_ids": [
+     "R1",
+     "R2",
+     "R3"
+    ],
+    "sampled_token_ids": [
+     [
+      102
+     ],
+     [
+      202
+     ],
+     [
+      302
+     ]
+    ]
+   },
+   "outputs": {
+    "R1": {
+     "new_token_ids": [
+      102
+     ],
+     "finish_reason": "length"
+    },
+    "R2": {
+     "new_token_ids": [
+      202
+     ],
+     "finish_reason": "length"
+    },
+    "R3": {
+     "new_token_ids": [
+      302
+     ],
+     "finish_reason": "length"
+    }
+   },
+   "after_update": {
+    "free_queue_order": [
+     6,
+     7,
+     8,
+     9,
+     2,
+     1,
+     4,
+     3,
+     5
+    ],
+    "num_free_blocks": 9,
+    "blocks": {
+     "1": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "2": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "3": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "4": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "5": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "6": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "7": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "8": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "9": {
+      "ref_cnt": 0,
+      "has_hash": false
+     }
+    },
+    "cached_hash_count": 0,
+    "requests": {},
+    "running_order": [],
+    "waiting_order": [],
+    "skipped_waiting_order": []
+   }
+  },
+  {
+   "step": 2,
+   "arrivals": [],
+   "scheduler_output": {
+    "scheduled_new_reqs": [],
+    "scheduled_cached_reqs": {
+     "req_ids": [],
+     "resumed_req_ids": [],
+     "new_block_ids": [],
+     "num_computed_tokens": [],
+     "num_output_tokens": []
+    },
+    "num_scheduled_tokens": {},
+    "total_num_scheduled_tokens": 0,
+    "scheduled_spec_decode_tokens": {},
+    "num_common_prefix_blocks": [
+     0
+    ],
+    "finished_req_ids": [
+     "R1",
+     "R2",
+     "R3"
+    ],
+    "preempted": []
+   },
+   "after_schedule": {
+    "free_queue_order": [
+     6,
+     7,
+     8,
+     9,
+     2,
+     1,
+     4,
+     3,
+     5
+    ],
+    "num_free_blocks": 9,
+    "blocks": {
+     "1": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "2": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "3": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "4": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "5": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "6": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "7": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "8": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "9": {
+      "ref_cnt": 0,
+      "has_hash": false
+     }
+    },
+    "cached_hash_count": 0,
+    "requests": {},
+    "running_order": [],
+    "waiting_order": [],
+    "skipped_waiting_order": []
+   },
+   "update_for_step": 2,
+   "model_runner_output": {
+    "req_ids": [],
+    "sampled_token_ids": []
+   },
+   "outputs": {},
+   "after_update": {
+    "free_queue_order": [
+     6,
+     7,
+     8,
+     9,
+     2,
+     1,
+     4,
+     3,
+     5
+    ],
+    "num_free_blocks": 9,
+    "blocks": {
+     "1": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "2": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "3": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "4": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "5": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "6": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "7": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "8": {
+      "ref_cnt": 0,
+      "has_hash": false
+     },
+     "9": {
+      "ref_cnt": 0,
+      "has_hash": false
+     }
+    },
+    "cached_hash_count": 0,
+    "requests": {},
+    "running_order": [],
+    "waiting_order": [],
+    "skipped_waiting_order": []
+   }
+  }
+ ],
+ "final_requests": {
+  "R1": {
+   "status": "FINISHED_LENGTH_CAPPED",
+   "output_token_ids": [
+    101,
+    102
+   ],
+   "num_output_tokens": 2,
+   "num_preemptions": 0
+  },
+  "R2": {
+   "status": "FINISHED_LENGTH_CAPPED",
+   "output_token_ids": [
+    201,
+    202
+   ],
+   "num_output_tokens": 2,
+   "num_preemptions": 0
+  },
+  "R3": {
+   "status": "FINISHED_LENGTH_CAPPED",
+   "output_token_ids": [
+    301,
+    302
+   ],
+   "num_output_tokens": 2,
+   "num_preemptions": 0
+  }
+ },
+ "unfinished": 0
+}

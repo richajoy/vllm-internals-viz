@@ -1,0 +1,57 @@
+{
+ "name": "basic",
+ "config": {
+  "block_size": 4,
+  "num_gpu_blocks": 10,
+  "max_num_batched_tokens": 64,
+  "max_num_seqs": 4,
+  "enable_prefix_caching": false,
+  "enable_chunked_prefill": true,
+  "long_prefill_token_threshold": 0,
+  "policy": "fcfs",
+  "async_scheduling": false,
+  "num_speculative_tokens": 0,
+  "max_model_len": 64
+ },
+ "max_steps": 20,
+ "requests": [
+  {
+   "request_id": "A",
+   "prompt_token_ids": [
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "max_tokens": 3,
+   "arrival_step": 0,
+   "priority": 0,
+   "output_token_ids": [
+    101,
+    102,
+    103
+   ]
+  },
+  {
+   "request_id": "B",
+   "prompt_token_ids": [
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+   ],
+   "max_tokens": 3,
+   "arrival_step": 0,
+   "priority": 0,
+   "output_token_ids": [
+    201,
+    202,
+    203
+   ]
+  }
+ ]
+}

@@ -1,0 +1,85 @@
+{
+ "name": "preemption_fcfs",
+ "config": {
+  "block_size": 4,
+  "num_gpu_blocks": 6,
+  "max_num_batched_tokens": 64,
+  "max_num_seqs": 4,
+  "enable_prefix_caching": false,
+  "enable_chunked_prefill": true,
+  "long_prefill_token_threshold": 0,
+  "policy": "fcfs",
+  "async_scheduling": false,
+  "num_speculative_tokens": 0,
+  "max_model_len": 64
+ },
+ "max_steps": 40,
+ "requests": [
+  {
+   "request_id": "A",
+   "prompt_token_ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+   ],
+   "max_tokens": 6,
+   "arrival_step": 0,
+   "priority": 0,
+   "output_token_ids": [
+    101,
+    102,
+    103,
+    104,
+    105,
+    106
+   ]
+  },
+  {
+   "request_id": "B",
+   "prompt_token_ids": [
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+   ],
+   "max_tokens": 6,
+   "arrival_step": 0,
+   "priority": 0,
+   "output_token_ids": [
+    201,
+    202,
+    203,
+    204,
+    205,
+    206
+   ]
+  },
+  {
+   "request_id": "C",
+   "prompt_token_ids": [
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "max_tokens": 6,
+   "arrival_step": 0,
+   "priority": 0,
+   "output_token_ids": [
+    301,
+    302,
+    303,
+    304,
+    305,
+    306
+   ]
+  }
+ ]
+}
