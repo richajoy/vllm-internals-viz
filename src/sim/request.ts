@@ -43,6 +43,7 @@ export function isFinishedStatus(status: RequestStatus): boolean {
 export interface SamplingParams {
   max_tokens: number
   ignore_eos?: boolean
+  eos_token_id?: number
   stop_token_ids?: number[]
   /** Structured output: allowed completions (toy choice grammar). */
   guided_choice?: string[]

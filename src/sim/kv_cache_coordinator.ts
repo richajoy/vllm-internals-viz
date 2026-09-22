@@ -59,7 +59,9 @@ export class UnitaryKVCacheCoordinator {
     return this.single_type_managers.map((m) => m.req_to_blocks.get(request_id) ?? [])
   }
 
+  /** KVCacheCoordinatorNoPrefixCache (caching off) always reports 0. */
   get_num_common_prefix_blocks(running_request_id: string): number[] {
+    if (!this.enable_caching) return this.single_type_managers.map(() => 0)
     return this.single_type_managers.map((m) => m.get_num_common_prefix_blocks(running_request_id))
   }
 

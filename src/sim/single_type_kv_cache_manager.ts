@@ -16,7 +16,6 @@ export class FullAttentionManager {
   req_to_blocks = new Map<string, KVCacheBlock[]>()
   /** request_id -> number of blocks already cached; only tracked for running requests. */
   num_cached_block = new Map<string, number>()
-  private _null_block: KVCacheBlock
   log: EventLog
 
   constructor(block_size: number, block_pool: BlockPool, enable_caching: boolean, kv_cache_group_id = 0, log: EventLog = NULL_LOG) {
@@ -24,7 +23,6 @@ export class FullAttentionManager {
     this.block_pool = block_pool
     this.enable_caching = enable_caching
     this.kv_cache_group_id = kv_cache_group_id
-    this._null_block = block_pool.null_block
     this.log = log
   }
 

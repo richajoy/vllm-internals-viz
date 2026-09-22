@@ -682,10 +682,14 @@ function Request_lt(a: Request, b: Request): boolean {
   return (a.constructor as typeof Request).compare(a, b) < 0
 }
 
-/** Port of vllm/v1/core/sched/utils.py::check_stop (no min_tokens, no EOS id). */
+/** Port of vllm/v1/core/sched/utils.py::check_stop (no min_tokens, no repetition detection). */
 export function check_stop(request: Request, max_model_len: number): boolean {
   const sp = request.sampling_params
   const last = request.output_token_ids[request.output_token_ids.length - 1]
+  if (sp.eos_token_id !== undefined && last === sp.eos_token_id && !sp.ignore_eos) {
+    request.status = RequestStatus.FINISHED_STOPPED
+    return true
+  }
   if (sp.stop_token_ids?.includes(last)) {
     request.status = RequestStatus.FINISHED_STOPPED
     request.stop_reason = last
