@@ -20,7 +20,7 @@ status and placeholder count.
 ```bash
 npm install
 npm run dev        # http://localhost:5173
-npm test           # 43 tests incl. 8 differential fixtures
+npm test           # 44 tests incl. 9 differential fixtures
 npm run typecheck && npm run lint
 ```
 
