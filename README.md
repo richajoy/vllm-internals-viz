@@ -1,32 +1,56 @@
-# React + TypeScript + Vite
+# vLLM engine, step by step
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+An interactive replay of vLLM's V1 engine loop: continuous batching, paged
+attention, KV block allocation and freeing, the `free_block_queue` linked
+list, slot mapping, prefix caching, chunked prefill, preemption, speculative
+decoding, structured output and async scheduling. Every class, method and
+field name on the page is a real one, pinned to
+[`vllm-project/vllm@adc3e03517`](https://github.com/vllm-project/vllm/tree/adc3e03517d2e7333a3bb2083bb4d394a2986876).
 
-Currently, two official plugins are available:
+The scheduler, KV cache manager, block pool and async scheduler are ported to
+TypeScript one module per vLLM file (`src/sim/`). They are proven against the
+real Python `Scheduler` by differential replay: `tools/trace_vllm.py` drives
+`vllm.v1.core.sched.scheduler.Scheduler` with a mocked model and dumps
+per-step traces to `tests/fixtures/`; `src/sim/differential.test.ts` requires
+the TypeScript port to reproduce every block id, free-queue order, ref count,
+status and placeholder count.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Run
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev        # http://localhost:5173
+npm test           # 43 tests incl. 8 differential fixtures
+npm run typecheck && npm run lint
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Keyboard: `←`/`→` phase, `↑`/`↓` step, `space` play. The URL hash
+(`#s=<preset>&i=<snapshot>`) is a deep link.
+
+## Regenerating fixtures
+
+Requires the vLLM checkout at `~/dev/vllm` with CPU torch in its `.venv`
+(`uv pip install --python .venv/bin/python torch -r requirements/common.txt`
+was sufficient on macOS arm64; no compiled extensions are needed to import
+the scheduler).
+
+```bash
+tools/gen_fixtures.sh    # runs every tools/scenarios/*.json -> tests/fixtures/
+```
+
+## What is simulated, what is not
+
+Simulated faithfully: `Scheduler.schedule` / `update_from_output`,
+`AsyncScheduler` placeholders, `KVCacheManager.allocate_slots` /
+`get_computed_blocks` / `free`, `UnitaryKVCacheCoordinator`,
+`FullAttentionManager`, `BlockPool` (lazy eviction, touch, hashless-first
+free order), `FreeKVCacheBlockQueue`, chained block hashing,
+`step` / `step_with_batch_queue`, the n-gram proposer's matching rule and the
+scheduler-side spec-decode rollback.
+
+Mocked: the model is an oracle that emits each request's scripted
+continuation; sampling is greedy; the worker keeps real `input_ids`,
+`positions`, `slot_mapping`, `query_start_loc`, `seq_lens`, `logits_indices`
+and a paged-memory array but runs no attention. Hashes are FNV-1a hex, not
+SHA-256 bytes. Single full-attention KV group only (no hybrid/Mamba, sliding
+window, KV connectors, encoder inputs, LoRA, DP or PP).

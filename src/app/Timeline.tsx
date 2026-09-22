@@ -63,7 +63,7 @@ export function Timeline({ events, from, to, selected, onSelect }: Props) {
             )}
             {sel.payload && (
               <pre className="mono text-[11px] whitespace-pre-wrap break-all m-0 p-2 rounded" style={{ background: 'var(--free)', maxHeight: 160, overflow: 'auto' }}>
-                {JSON.stringify(sel.payload, null, 1).replace(/\n\s+(?=[\d"\]\}-])/g, ' ')}
+                {JSON.stringify(sel.payload, null, 1).replace(/\n\s+(?=[\d"\]}-])/g, ' ')}
               </pre>
             )}
           </div>

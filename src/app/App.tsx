@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Component } from '../sim/events'
 import { PRESETS, preset, type Scenario } from '../sim/scenario'
 import { run_simulation } from '../sim/simulation'
 import { VLLM_COMMIT_SHORT } from '../sim/source_refs'
 import { Controls } from './Controls'
+import { Drift } from './Drift'
 import { KVView } from './KVView'
 import { PHASES, PHASE_TITLE, requestOrder, stepBoundary } from './model'
 import { PipelineRail } from './PipelineRail'
@@ -11,10 +12,17 @@ import { SchedulerView } from './SchedulerView'
 import { Timeline } from './Timeline'
 import { WorkerView } from './WorkerView'
 
+function readHash(): { preset: string; i: number } {
+  const h = new URLSearchParams(location.hash.replace(/^#/, ''))
+  const p = h.get('s') ?? PRESETS[0].name
+  return { preset: PRESETS.some((x) => x.name === p) ? p : PRESETS[0].name, i: Number(h.get('i') ?? 0) || 0 }
+}
+
 export default function App() {
-  const [presetName, setPresetName] = useState(PRESETS[0].name)
-  const [scenario, setScenario] = useState<Scenario>(() => preset(PRESETS[0].name))
-  const [cursor, setCursor] = useState(0)
+  const initial = useMemo(() => readHash(), [])
+  const [presetName, setPresetName] = useState(initial.preset)
+  const [scenario, setScenario] = useState<Scenario>(() => preset(initial.preset))
+  const [cursor, setCursor] = useState(initial.i)
   const [selected, setSelected] = useState<number | null>(null)
   const [playing, setPlaying] = useState(false)
   const [speed, setSpeed] = useState(1)
@@ -28,17 +36,25 @@ export default function App() {
     }
   }, [scenario])
 
-  const snapshots = result.ok ? result.value.snapshots : []
-  const events = result.ok ? result.value.events : []
+  const snapshots = useMemo(() => (result.ok ? result.value.snapshots : []), [result])
+  const events = useMemo(() => (result.ok ? result.value.events : []), [result])
   const idx = Math.min(cursor, Math.max(0, snapshots.length - 1))
   const snap = snapshots[idx]
   const order = useMemo(() => requestOrder(snapshots), [snapshots])
 
+  const prevScenario = useRef(scenario)
   useEffect(() => {
+    if (prevScenario.current === scenario) return
+    prevScenario.current = scenario
     setCursor(0)
     setSelected(null)
     setPlaying(false)
   }, [scenario])
+
+  useEffect(() => {
+    if (presetName === 'custom') return
+    history.replaceState(null, '', `#s=${presetName}&i=${idx}`)
+  }, [presetName, idx])
 
   useEffect(() => {
     if (!playing) return
@@ -112,7 +128,7 @@ export default function App() {
       {snap && (
         <main className="flex-1 min-h-0 grid gap-3 p-3" style={{ gridTemplateColumns: showControls ? '270px 210px minmax(480px, 1fr) 330px' : '210px minmax(480px, 1fr) 330px' }}>
           {showControls && (
-            <div className="overflow-y-auto scroll-thin min-h-0">
+            <div className="overflow-y-auto scroll-thin min-h-0 flex flex-col gap-3">
               <Controls
                 scenario={scenario}
                 presetName={presetName}
@@ -125,6 +141,7 @@ export default function App() {
                   setScenario(s)
                 }}
               />
+              <Drift />
             </div>
           )}
           <div className="overflow-y-auto scroll-thin min-h-0 flex flex-col gap-3">
@@ -179,7 +196,7 @@ export default function App() {
             <input type="range" min={0.5} max={4} step={0.5} value={speed} onChange={(e) => setSpeed(Number(e.target.value))} style={{ width: 70 }} />
           </label>
           <input type="range" min={0} max={Math.max(0, snapshots.length - 1)} value={idx} onChange={(e) => setCursor(Number(e.target.value))} className="flex-1" aria-label="position" />
-          <span className="mono text-xs whitespace-nowrap">step {snap.step} / {stepsTotal - 1}</span>
+          <span className="mono text-xs whitespace-nowrap" title="← → phase · ↑ ↓ step · space play">step {snap.step} / {stepsTotal - 1}</span>
           <div className="flex gap-1">
             {PHASES.map((p) => (
               <span key={p} className="chip phase-chip mono text-[10px]" data-active={snap.phase === p} data-done={snap.phase !== p && phasesDoneThisStep.has(p)}>
