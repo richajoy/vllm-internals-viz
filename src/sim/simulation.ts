@@ -40,6 +40,8 @@ export interface BlockSnapshot {
   is_null: boolean
   /** Token id stored in each slot (GPU memory), null if never written. */
   slots: (number | null)[]
+  /** External id of the request that wrote each slot. */
+  writers: (string | null)[]
   /** Which request currently maps to this block (from req_to_blocks), if any. */
   owners: string[]
 }
@@ -147,7 +149,9 @@ export function run_simulation(scenario: Scenario): SimulationResult {
   let events_cursor = 0
   let step = 0
 
-  const snapshot = (phase: Phase, label = PHASE_LABEL[phase]): void => {
+  const snapshot = (phase: Phase, label = PHASE_LABEL[phase], force = false): void => {
+    // Skip empty snapshots (phase transitions that emitted nothing).
+    if (!force && log.events.length === events_cursor) return
     const s = engine.scheduler
     const km = s.kv_cache_manager
     const pool = km.block_pool
@@ -219,6 +223,7 @@ export function run_simulation(scenario: Scenario): SimulationResult {
           block_hash_num_tokens: b.block_hash_num_tokens,
           is_null: b.is_null,
           slots: engine.model_runner.block_contents(b.block_id),
+          writers: engine.model_runner.block_writers(b.block_id).map((w) => (w === null ? null : external_of.get(w) ?? w)),
           owners: owners.get(b.block_id) ?? [],
         })),
         free_queue_order: pool.free_block_queue.get_all_free_blocks().map((b) => b.block_id),
@@ -268,7 +273,7 @@ export function run_simulation(scenario: Scenario): SimulationResult {
   const last_arrival = Math.max(-1, ...scenario.requests.map((r) => r.arrival_step))
 
   log.step = 0
-  snapshot('add_request', 'engine ready')
+  snapshot('add_request', 'engine ready', true)
   for (step = 0; step < scenario.max_steps; step++) {
     log.step = step
     log.setPhase('add_request')
@@ -291,7 +296,7 @@ export function run_simulation(scenario: Scenario): SimulationResult {
       engine.add_request(request)
     }
     if (!engine.has_requests() && step > last_arrival) {
-      snapshot('add_request', 'all requests finished')
+      snapshot('add_request', 'all requests finished', true)
       break
     }
     if ((arrivals.get(step) ?? []).length > 0) snapshot('add_request')

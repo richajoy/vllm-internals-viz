@@ -99,6 +99,8 @@ export class GPUModelRunner {
   batch: (string | null)[] = []
   /** Paged KV memory: slot -> token id whose K/V lives there (null = never written). */
   kv_cache: (number | null)[]
+  /** Which request wrote each slot (stale data keeps its old writer). */
+  kv_writer: (string | null)[]
   execute_model_state: ExecuteModelState | null = null
   drafter: NgramProposer | null
   private _draft_token_ids: DraftTokenIds | null = null
@@ -113,6 +115,7 @@ export class GPUModelRunner {
     this.oracle = oracle
     this.log = log
     this.kv_cache = new Array<number | null>(cfg.num_gpu_blocks * cfg.block_size).fill(null)
+    this.kv_writer = new Array<string | null>(cfg.num_gpu_blocks * cfg.block_size).fill(null)
     this.drafter = cfg.spec
       ? new NgramProposer({
           prompt_lookup_min: cfg.spec.prompt_lookup_min,
@@ -321,7 +324,10 @@ export class GPUModelRunner {
     // Forward pass: attention kernels write K/V for every scheduled token into
     // paged memory via reshape_and_cache_flash at slot_mapping.
     prepared.slot_mapping.forEach((slot, i) => {
-      if (slot !== PAD_SLOT_ID) this.kv_cache[slot] = prepared.input_ids[i]
+      if (slot === PAD_SLOT_ID) return
+      this.kv_cache[slot] = prepared.input_ids[i]
+      const r = prepared.spans.findIndex(([a, b]) => i >= a && i < b)
+      this.kv_writer[slot] = r === -1 ? null : prepared.req_ids[r]
     })
     this.log.emit(
       'GPUModelRunner',
@@ -492,5 +498,10 @@ export class GPUModelRunner {
   block_contents(block_id: number): (number | null)[] {
     const bs = this.cfg.block_size
     return this.kv_cache.slice(block_id * bs, (block_id + 1) * bs)
+  }
+
+  block_writers(block_id: number): (string | null)[] {
+    const bs = this.cfg.block_size
+    return this.kv_writer.slice(block_id * bs, (block_id + 1) * bs)
   }
 }
