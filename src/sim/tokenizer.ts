@@ -44,7 +44,7 @@ export class ToyTokenizer {
 
   decode(ids: readonly number[]): string {
     return ids
-      .filter((id) => id !== BOS_ID && id !== PAD_ID)
+      .filter((id) => id !== BOS_ID && id !== PAD_ID && id !== EOS_ID)
       .map((id) => this.id_to_token(id))
       .join(' ')
       .replace(/ ([,.!?;:])/g, '$1')
