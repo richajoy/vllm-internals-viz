@@ -1,0 +1,9 @@
+vllm-internals-viz
+Copyright 2026 Richard Joy
+
+This project contains a TypeScript port of the scheduler, KV cache manager,
+block pool, async scheduler and related components of vLLM
+(https://github.com/vllm-project/vllm), pinned to commit
+adc3e03517d2e7333a3bb2083bb4d394a2986876. Class, method and field names
+mirror the upstream source. vLLM is licensed under the Apache License 2.0,
+Copyright the vLLM project contributors.

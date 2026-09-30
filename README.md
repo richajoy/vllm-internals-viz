@@ -1,5 +1,7 @@
 # vLLM engine, step by step
 
+**Live demo:** https://richajoy.github.io/vllm-internals-viz/
+
 An interactive replay of vLLM's V1 engine loop: continuous batching, paged
 attention, KV block allocation and freeing, the `free_block_queue` linked
 list, slot mapping, prefix caching, chunked prefill, preemption, speculative
@@ -54,3 +56,7 @@ continuation; sampling is greedy; the worker keeps real `input_ids`,
 and a paged-memory array but runs no attention. Hashes are FNV-1a hex, not
 SHA-256 bytes. Single full-attention KV group only (no hybrid/Mamba, sliding
 window, KV connectors, encoder inputs, LoRA, DP or PP).
+
+## License
+
+Apache License 2.0. See `LICENSE` and `NOTICE`; the simulator ports vLLM (Apache 2.0).
