@@ -52,7 +52,7 @@ describe('block hashing', () => {
     expect(h2).not.toBe(h2other)
   })
 
-  it('request hasher only hashes full blocks and extends incrementally (blog Fig 6)', () => {
+  it('request hasher only hashes full blocks and extends incrementally', () => {
     const req = mkReq('A', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 2], 4)
     expect(req.block_hashes).toHaveLength(2)
     req.append_output_token_ids(11)
@@ -101,7 +101,7 @@ describe('BlockPool', () => {
   })
 })
 
-describe('KVCacheManager (blog Figures 3, 6, 7, 8)', () => {
+describe('KVCacheManager', () => {
   it('Fig 3: 10 tokens, block_size 4 -> blocks 1,2,3; free queue continues at 4', () => {
     const mgr = new KVCacheManager({ num_gpu_blocks: 11, block_size: 4, max_model_len: 64, enable_caching: false })
     const req = mkReq('r0', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 4, 4, false)
@@ -121,9 +121,8 @@ describe('KVCacheManager (blog Figures 3, 6, 7, 8)', () => {
     const a = mkReq('A', [...prefix, 9, 10, 2], 4)
     const [ca, na] = mgr.get_computed_blocks(a)
     expect(na).toBe(0)
-    // First request allocates 5 blocks (11 prompt + 4 max_tokens... the blog
-    // allocates for the prompt and grows; here we mimic 11 prompt tokens then
-    // decode tokens to reach 5 blocks total).
+    // First request: allocate for 11 prompt tokens, then grow with decode
+    // tokens until it holds 5 blocks.
     const got = mgr.allocate_slots(a, 11, { new_computed_blocks: ca })
     expect(got?.get_block_ids()).toEqual([[1, 2, 3]])
     expect(mgr.block_pool.cached_block_hash_to_block.size).toBe(2) // blocks 1,2 hashed, 3 incomplete

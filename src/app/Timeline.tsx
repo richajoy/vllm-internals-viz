@@ -39,7 +39,7 @@ export function Timeline({ events, from, to, selected, onSelect }: Props) {
               <div className="flex gap-2 items-baseline">
                 <span className="hint text-[10px] mono w-8 shrink-0">s{e.step}</span>
                 <span className="mono text-[11px] shrink-0" style={{ color: 'var(--accent)' }}>{e.component}</span>
-                <span className="text-[12px] leading-snug break-words">{e.message}</span>
+                <span className="text-[12px] leading-snug min-w-0" style={{ overflowWrap: 'anywhere' }}>{e.message}</span>
               </div>
             </button>
           )
@@ -58,7 +58,7 @@ export function Timeline({ events, from, to, selected, onSelect }: Props) {
                 <a href={githubUrl(sel.ref)} target="_blank" rel="noreferrer" style={{ color: 'var(--accent)' }}>
                   {sel.ref.file}:{sel.ref.line}
                 </a>
-                {sel.ref.blogEraName && <span className="hint"> · the Aug-2025 blog called this “{sel.ref.blogEraName}”</span>}
+                {sel.ref.formerName && <span className="hint"> · called “{sel.ref.formerName}” in Aug 2025</span>}
               </div>
             )}
             {sel.payload && (

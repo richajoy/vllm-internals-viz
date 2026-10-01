@@ -30,13 +30,15 @@ export function PipelineRail({ snap, liveComponents }: { snap: Snapshot; liveCom
     <div className="panel p-3 flex flex-col gap-1">
       <div className="panel-title mb-1">Request path</div>
       {NODES.map((n, i) => {
-        const inPhase = n.phases.includes(snap.phase)
+        const inPhase = !snap.idle && n.phases.includes(snap.phase)
         const live = inPhase && n.components.some((c) => liveComponents.has(c))
         return (
           <div key={n.name}>
             <div className="rail-node" data-live={live} style={{ opacity: inPhase ? 1 : 0.6 }}>
               <div className="flex items-baseline justify-between gap-2">
-                <span className="text-[12px] leading-tight" style={{ fontVariationSettings: live ? "'wght' 650" : "'wght' 450" }} title={n.file}>{n.name}</span>
+                <span className="text-[12px] leading-tight min-w-0" style={{ fontVariationSettings: live ? "'wght' 650" : "'wght' 450", overflowWrap: 'anywhere' }} title={n.file}>
+                  {n.name.split(/(?<=[._])/).map((part, k) => (k === 0 ? part : [<wbr key={k} />, part]))}
+                </span>
                 
               </div>
             </div>

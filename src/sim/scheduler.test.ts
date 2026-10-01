@@ -72,7 +72,7 @@ describe('Scheduler.schedule', () => {
     expect(out2.total_num_scheduled_tokens).toBe(0)
   })
 
-  it('blog Fig 5: 18-token prompt, budget 8 -> 3 chunks, sampled token only after the last', () => {
+  it('chunked prefill: 18-token prompt, budget 8 -> 3 chunks, sampled token only after the last', () => {
     const s = mkScheduler({ max_num_batched_tokens: 8, enable_prefix_caching: false })
     s.add_request(mkReq('A', Array.from({ length: 18 }, (_, i) => i + 1), 2, s))
     const { steps, outputs } = run(s)

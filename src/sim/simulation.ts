@@ -48,7 +48,10 @@ export interface BlockSnapshot {
 
 export interface Snapshot {
   index: number
+  /** Engine step, 1-based; 0 is the idle engine before the first step. */
   step: number
+  /** True when no step is in progress (engine ready, or all requests finished). */
+  idle: boolean
   /** The phase whose completion this snapshot captures. */
   phase: Phase
   label: string
@@ -148,8 +151,10 @@ export function run_simulation(scenario: Scenario): SimulationResult {
   const snapshots: Snapshot[] = []
   let events_cursor = 0
   let step = 0
+  // Displayed step: 1-based so it matches Scheduler.current_step; 0 means nothing has run yet.
+  let display_step = 0
 
-  const snapshot = (phase: Phase, label = PHASE_LABEL[phase], force = false): void => {
+  const snapshot = (phase: Phase, label = PHASE_LABEL[phase], force = false, idle = false): void => {
     // Skip empty snapshots (phase transitions that emitted nothing).
     if (!force && log.events.length === events_cursor) return
     const s = engine.scheduler
@@ -187,7 +192,8 @@ export function run_simulation(scenario: Scenario): SimulationResult {
     const last = last_scheduler_output
     const snap: Snapshot = {
       index: snapshots.length,
-      step,
+      step: display_step,
+      idle,
       phase,
       label,
       events_from: events_cursor,
@@ -273,9 +279,10 @@ export function run_simulation(scenario: Scenario): SimulationResult {
   const last_arrival = Math.max(-1, ...scenario.requests.map((r) => r.arrival_step))
 
   log.step = 0
-  snapshot('add_request', 'engine ready', true)
+  snapshot('add_request', 'engine ready', true, true)
   for (step = 0; step < scenario.max_steps; step++) {
-    log.step = step
+    display_step = step + 1
+    log.step = display_step
     log.setPhase('add_request')
     for (const r of arrivals.get(step) ?? []) {
       log.emit('LLMEngine', 'add_request', `LLM.generate -> LLMEngine.add_request("${r.id}")`, { request_id: r.id }, REF.LLMEngine_add_request)
@@ -296,7 +303,9 @@ export function run_simulation(scenario: Scenario): SimulationResult {
       engine.add_request(request)
     }
     if (!engine.has_requests() && step > last_arrival) {
-      snapshot('add_request', 'all requests finished', true)
+      display_step = step
+      log.step = step
+      snapshot('add_request', 'all requests finished', true, true)
       break
     }
     if ((arrivals.get(step) ?? []).length > 0) snapshot('add_request')
@@ -306,7 +315,7 @@ export function run_simulation(scenario: Scenario): SimulationResult {
       log.emit('EngineCoreProc', 'output_thread', `output_queue.put_nowait(EngineCoreOutputs) -> output thread -> msgpack -> ZMQ PUSH -> client PULL -> OutputProcessor`, { num_outputs: outs.outputs.length }, REF.EngineCoreProc_process_output_sockets)
       output_processor.process_outputs(outs)
     } else {
-      log.emit('EngineCore', 'no_output', `step ${step}: no EngineCoreOutputs this step${engine.batch_queue ? ' (batch queue filling)' : ''}`, {}, REF.EngineCore_step_with_batch_queue)
+      log.emit('EngineCore', 'no_output', `step ${display_step}: no EngineCoreOutputs this step${engine.batch_queue ? ' (batch queue filling)' : ''}`, {}, REF.EngineCore_step_with_batch_queue)
     }
     snapshot('output', outs && outs.outputs.length ? 'OutputProcessor.process_outputs()' : 'no output this step')
   }

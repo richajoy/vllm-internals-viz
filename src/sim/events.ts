@@ -37,8 +37,8 @@ export interface SourceRef {
   /** Path inside the vLLM repo. */
   file: string
   line: number
-  /** Name the 2025 blog used, if it differs from current source. */
-  blogEraName?: string
+  /** Name vLLM used in Aug 2025, if it differs from current source. */
+  formerName?: string
 }
 
 export interface SimEvent {

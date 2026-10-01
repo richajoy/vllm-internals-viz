@@ -1,6 +1,6 @@
 // Source references pinned to vLLM commit adc3e03517 (main, 2026-08-06).
-// `blogEraName` records what Aleksa Gordic's Aug-2025 post (commit 42172ad)
-// called the thing when the name differs today.
+// `formerName` records what vLLM called the thing in Aug 2025 (commit 42172ad)
+// when the name differs today.
 
 import type { SourceRef } from './events'
 
@@ -11,10 +11,10 @@ export function githubUrl(ref: SourceRef): string {
   return `https://github.com/vllm-project/vllm/blob/${VLLM_COMMIT}/${ref.file}#L${ref.line}`
 }
 
-const r = (file: string, line: number, blogEraName?: string): SourceRef => ({
+const r = (file: string, line: number, formerName?: string): SourceRef => ({
   file,
   line,
-  blogEraName,
+  formerName,
 })
 
 export const REF = {

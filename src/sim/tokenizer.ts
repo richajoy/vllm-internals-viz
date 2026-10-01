@@ -1,6 +1,6 @@
 // Deterministic word-level tokenizer so token ids, block hashes and slot
 // mappings stay legible. Ids are assigned in first-seen order after the
-// special tokens, mirroring the blog's `[1, 2, 3, 4, 5]` style examples.
+// special tokens, so examples read as small ids like `[1, 2, 3, 4, 5]`.
 
 export const PAD_ID = 0
 export const BOS_ID = 1

@@ -1,5 +1,5 @@
 // Scenario definitions: engine config knobs + requests with arrival steps.
-// Presets mirror the blog's worked examples and the differential fixtures.
+// Presets mirror the differential fixtures.
 
 import type { EngineConfig } from './engine_core'
 
@@ -50,7 +50,7 @@ export const PRESETS: Scenario[] = [
   {
     name: 'basic',
     title: 'Two prompts, one step',
-    description: 'The blog\'s opening example: two prompts arrive together, are prefilled in the same step, then decode together as one flattened batch.',
+    description: 'Two prompts arrive together, are prefilled in the same step, then decode together as one flattened batch.',
     config: { ...BASE_CONFIG },
     requests: [
       { id: 'A', prompt: 'Hello, my name is', arrival_step: 0, max_tokens: 4, continuation: 'Aleksa and I like GPUs' },
@@ -74,7 +74,7 @@ export const PRESETS: Scenario[] = [
   {
     name: 'chunked_prefill',
     title: 'Chunked prefill',
-    description: 'One long prompt against a small token budget: the prefill is split across steps and only the last chunk samples a token (blog Figure 5).',
+    description: 'One long prompt against a small token budget: the prefill is split across steps and only the last chunk samples a token.',
     config: { ...BASE_CONFIG, max_num_batched_tokens: 8, enable_prefix_caching: false },
     requests: [
       { id: 'A', prompt: 'One two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen', arrival_step: 0, max_tokens: 2, continuation: 'eighteen nineteen' },
@@ -85,7 +85,7 @@ export const PRESETS: Scenario[] = [
   {
     name: 'prefix_cache',
     title: 'Prefix caching',
-    description: 'Two prompts share an 8-token prefix. The second request hits two cached blocks (hash chain), touches them, and only computes its own tail (blog Figures 6-8).',
+    description: 'Two prompts share an 8-token prefix. The second request hits two cached blocks (hash chain), touches them, and only computes its own tail.',
     config: { ...BASE_CONFIG, num_gpu_blocks: 17 },
     requests: [
       { id: 'A', prompt: 'Today is a nice and warm summer day! My name is', arrival_step: 0, max_tokens: 2, continuation: 'Aleksa' },

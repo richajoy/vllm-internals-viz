@@ -39,7 +39,7 @@ export function WorkerView({ snap, order }: { snap: Snapshot; order: string[] })
                     const ext = rid ? snap.id_map[rid] ?? rid : ''
                     const isLogit = p.logits_indices.includes(i)
                     return (
-                      <td key={i} className="text-center px-1 rounded-sm" style={{ background: rid ? requestColor(ext, order) : undefined, color: 'white', outline: isLogit ? '2px solid var(--ink)' : undefined }} title={isLogit ? 'logits_indices: logits computed here' : ''}>
+                      <td key={i} className="text-center px-1 rounded-sm" style={{ background: rid ? requestColor(ext, order) : undefined, color: 'var(--on-accent)', outline: isLogit ? '2px solid var(--ink)' : undefined }} title={isLogit ? 'logits_indices: logits computed here' : ''}>
                         {ext}
                       </td>
                     )

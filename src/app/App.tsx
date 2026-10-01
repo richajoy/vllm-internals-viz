@@ -115,7 +115,7 @@ export default function App() {
     <div className="h-full flex flex-col" style={{ minWidth: 960 }}>
       <header className="flex items-baseline gap-4 px-4 py-2" style={{ borderBottom: '1px solid var(--rule)', background: 'var(--panel)' }}>
         <h1 className="m-0 text-[15px]" style={{ fontVariationSettings: "'CASL' 0.6, 'wght' 700" }}>vLLM engine, step by step</h1>
-        <span className="hint text-xs">A faithful TypeScript replay of the V1 scheduler, KV cache manager and model runner, pinned to vllm-project/vllm@{VLLM_COMMIT_SHORT}. Every name is a real class or field.</span>
+        <span className="hint text-xs">The V1 scheduler, KV cache manager and model runner, pinned to vllm-project/vllm@{VLLM_COMMIT_SHORT}. Every name is a vLLM class or field.</span>
         <button className="tbtn ml-auto" onClick={() => setShowControls((v) => !v)}>{showControls ? 'hide scenario' : 'edit scenario'}</button>
       </header>
 
@@ -195,11 +195,11 @@ export default function App() {
             speed
             <input type="range" min={0.5} max={4} step={0.5} value={speed} onChange={(e) => setSpeed(Number(e.target.value))} style={{ width: 70 }} />
           </label>
-          <input type="range" min={0} max={Math.max(0, snapshots.length - 1)} value={idx} onChange={(e) => setCursor(Number(e.target.value))} className="flex-1" aria-label="position" />
+          <input type="range" min={0} max={Math.max(0, snapshots.length - 1)} value={idx} onChange={(e) => setCursor(Number(e.target.value))} className="flex-1 min-w-[80px]" aria-label="position" />
           <span className="mono text-xs whitespace-nowrap" title="← → phase · ↑ ↓ step · space play">step {snap.step} / {stepsTotal - 1}</span>
-          <div className="flex gap-1">
+          <div className="flex flex-wrap justify-end gap-1 min-w-0">
             {PHASES.map((p) => (
-              <span key={p} className="chip phase-chip mono text-[10px]" data-active={snap.phase === p} data-done={snap.phase !== p && phasesDoneThisStep.has(p)}>
+              <span key={p} className="chip phase-chip mono text-[10px]" data-active={!snap.idle && snap.phase === p} data-done={!snap.idle && snap.phase !== p && phasesDoneThisStep.has(p)}>
                 {PHASE_TITLE[p]}
               </span>
             ))}

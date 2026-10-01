@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import type { EngineConfig } from '../sim/engine_core'
 import { PRESETS, type Scenario, type ScenarioRequest } from '../sim/scenario'
 
@@ -11,9 +12,26 @@ interface Props {
 function Num({ label, value, min, max, onChange, hint }: { label: string; value: number; min?: number; max?: number; onChange: (v: number) => void; hint?: string }) {
   return (
     <label className="flex items-center justify-between gap-2" title={hint}>
-      <span className="mono text-[11px]">{label}</span>
-      <input type="number" value={value} min={min} max={max} onChange={(e) => onChange(Number(e.target.value))} />
+      <span className="mono text-[11px] min-w-0" style={{ overflowWrap: 'anywhere' }}>
+        {label.split(/(?<=_)/).map((part, k) => (k === 0 ? part : [<wbr key={k} />, part]))}
+      </span>
+      <input type="number" className="shrink-0" value={value} min={min} max={max} onChange={(e) => onChange(Number(e.target.value))} style={{ width: '4.5em' }} />
     </label>
+  )
+}
+
+/** Single-line text that wraps instead of scrolling, so long prompts stay fully visible. */
+function WrapText({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder: string }) {
+  const rows = Math.max(1, Math.ceil(Math.max(value.length, placeholder.length) / 28))
+  return (
+    <textarea
+      className="w-full min-w-0 resize-none leading-snug"
+      rows={rows}
+      value={value}
+      placeholder={placeholder}
+      onChange={(e) => onChange(e.target.value.replace(/\n/g, ' '))}
+      style={{ fieldSizing: 'content', overflowWrap: 'anywhere' } as CSSProperties}
+    />
   )
 }
 
@@ -36,9 +54,9 @@ export function Controls({ scenario, presetName, onPreset, onChange }: Props) {
   const spec = c.spec
   return (
     <div className="panel p-3 flex flex-col gap-3 text-[12px]">
-      <div className="flex items-baseline justify-between">
-        <div className="panel-title">Scenario</div>
-        <select value={presetName} onChange={(e) => onPreset(e.target.value)}>
+      <div className="flex items-center gap-2">
+        <div className="panel-title shrink-0">Scenario</div>
+        <select className="flex-1 min-w-0" value={presetName} onChange={(e) => onPreset(e.target.value)}>
           {PRESETS.map((p) => (
             <option key={p.name} value={p.name}>{p.title}</option>
           ))}
@@ -111,10 +129,10 @@ export function Controls({ scenario, presetName, onPreset, onChange }: Props) {
         <div className="flex flex-col gap-2">
           {scenario.requests.map((r, i) => (
             <div key={i} className="grid gap-1 p-2 rounded" style={{ background: 'var(--free)', gridTemplateColumns: '1fr' }}>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                 <input type="text" className="mono w-12" value={r.id} onChange={(e) => setReq(i, { id: e.target.value })} />
-                <span className="hint text-[11px]">arrives step</span>
-                <input type="number" value={r.arrival_step} min={0} onChange={(e) => setReq(i, { arrival_step: Number(e.target.value) })} style={{ width: '3.5em' }} />
+                <span className="hint text-[11px]">arrives at step</span>
+                <input type="number" value={r.arrival_step + 1} min={1} onChange={(e) => setReq(i, { arrival_step: Math.max(0, Number(e.target.value) - 1) })} style={{ width: '3.5em' }} />
                 <span className="hint text-[11px]">max_tokens</span>
                 <input type="number" value={r.max_tokens} min={1} onChange={(e) => setReq(i, { max_tokens: Number(e.target.value) })} style={{ width: '3.5em' }} />
                 {c.policy === 'priority' && (
@@ -127,9 +145,9 @@ export function Controls({ scenario, presetName, onPreset, onChange }: Props) {
                   ×
                 </button>
               </div>
-              <input type="text" value={r.prompt} onChange={(e) => setReq(i, { prompt: e.target.value })} placeholder="prompt" />
-              <input type="text" value={r.continuation ?? ''} onChange={(e) => setReq(i, { continuation: e.target.value })} placeholder="model continuation (what the mock model will say)" />
-              <input type="text" value={r.guided_choice?.join(' | ') ?? ''} onChange={(e) => setReq(i, { guided_choice: e.target.value.trim() ? e.target.value.split('|').map((s) => s.trim()) : undefined })} placeholder="guided choices, e.g. Positive | Negative (optional)" />
+              <WrapText value={r.prompt} onChange={(v) => setReq(i, { prompt: v })} placeholder="prompt" />
+              <WrapText value={r.continuation ?? ''} onChange={(v) => setReq(i, { continuation: v })} placeholder="model continuation (what the model will say)" />
+              <WrapText value={r.guided_choice?.join(' | ') ?? ''} onChange={(v) => setReq(i, { guided_choice: v.trim() ? v.split('|').map((s) => s.trim()) : undefined })} placeholder="guided choices, e.g. Positive | Negative (optional)" />
             </div>
           ))}
         </div>
